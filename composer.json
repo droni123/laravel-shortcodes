@@ -1,0 +1,22 @@
+{
+    "name": "droni/laravel-shortcodes",
+    "description": "Laravel shortcodes by Droni",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["laravel", "shortcodes"],
+    "authors": [
+        {
+            "name": "Idel",
+            "email": "droni@idel.com.mx"
+        }
+    ],
+    "require": {
+        "laravel/framework": "^11.0 || ^12.0 || ^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Droni\\Shortcodes\\": "src/Shortcodes/"
+        }
+    },
+    "minimum-stability": "dev"
+}
