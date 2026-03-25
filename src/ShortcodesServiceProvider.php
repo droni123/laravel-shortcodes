@@ -12,16 +12,19 @@ class ShortcodesServiceProvider extends ServiceProvider {
     public function register(){
         $this->registerShortcode();
         $this->registerView();    
-        $this->mergeConfigFrom(__DIR__ . '/../../config/droni-laravel-shortcodes.php','droni-laravel-shortcodes');
+        $this->mergeConfigFrom(__DIR__ . '/../config/droni-laravel-shortcodes.php','droni-laravel-shortcodes');
     }
     /**
      * Boot methods
      */
     public function boot(){
-        $this->publishes([
-            __DIR__ . '/../../config/droni-laravel-shortcodes.php' => config_path('droni-laravel-shortcodes.php'),
-        ]);
+        //if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/droni-laravel-shortcodes.php' => config_path('droni-laravel-shortcodes.php'),
+            ], 'config');
+        //}
     }
+    //php artisan vendor:publish --provider="Droni\Shortcodes\ShortcodesServiceProvider"
     /**
      * Register the Shortcode
      */

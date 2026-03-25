@@ -71,7 +71,7 @@ class View extends IlluminateView {
         } elseif ($this->shortcode->mode === Shortcode::modeStrip) {
             $contents = $this->shortcode->strip($contents);
         } else {
-            $mode = config('gornymedia-laravel-shortcodes.mode');
+            $mode = config('droni-laravel-shortcodes.mode');
             if (in_array($mode, ['compile','strip'])) {
                 $mode === 'compile' 
                 ? $contents = $this->shortcode->compile($contents) 

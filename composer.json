@@ -15,7 +15,17 @@
     },
     "autoload": {
         "psr-4": {
-            "Droni\\Shortcodes\\": "src/Shortcodes/"
+            "Droni\\Shortcodes\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Droni\\Shortcodes\\ShortcodesServiceProvider"
+            ],
+            "aliases": {
+                "Shortcode": "Droni\\Shortcodes\\Facades\\Shortcode"
+            }
         }
     },
     "minimum-stability": "dev"
