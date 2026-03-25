@@ -1,60 +1,68 @@
 <?php
-
-namespace Droni\Shortcodes;
-
+namespace App\Support\Shortcodes;
+use App\Support\Shortcodes\View\Factory;
 use Illuminate\Support\ServiceProvider;
-use Droni\Shortcodes\Illuminate\View\Factory;
-
+use App\Support\Shortcodes\Compilers\ShortcodeCompiler;
 class ShortcodesServiceProvider extends ServiceProvider {
     /**
-     * Register the service provider
-     */
-    public function register(){
-        $this->registerShortcode();
-        $this->registerView();    
-        $this->mergeConfigFrom(__DIR__ . '/../config/droni-laravel-shortcodes.php','droni-laravel-shortcodes');
-    }
-    /**
-     * Boot methods
-     */
+     * Realizar el arranque de los servicios después del registro.
+     **/
     public function boot(){
-        //if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__ . '/../config/droni-laravel-shortcodes.php' => config_path('droni-laravel-shortcodes.php'),
-            ], 'config');
-        //}
+        $this->enableCompiler();
     }
-    //php artisan vendor:publish --provider="Droni\Shortcodes\ShortcodesServiceProvider"
     /**
-     * Register the Shortcode
+     * Habilitar el compilador.
      */
-    protected function registerShortcode(){
-        $this->app->singleton('shortcode', function($app) {
-            return new Shortcode();
+    public function enableCompiler(){
+        // Comprobar si el compilador está habilitado automáticamente
+        $state = $this->app['config']->get('laravel-shortcodes::enabled', false);
+        // Habilitar cuando sea necesario
+        if ($state) {
+            $this->app['shortcode.compiler']->enable();
+        }
+    }
+    /**
+     * Registro de service provider.
+     **/
+    public function register(){
+        $this->registerShortcodeCompiler();
+        $this->registerShortcode();
+        $this->registerView();
+    }
+    /**
+     * Registro short code compilador.
+     */
+    public function registerShortcodeCompiler(){
+        $this->app->singleton('shortcode.compiler', function ($app) {
+            return new ShortcodeCompiler();
         });
     }
     /**
-     * Register the View
+     * Registro de shortcode.
      */
-    protected function registerView(){
-        $this->app->singleton('view', function($app) {
-            $resolver   = $app['view.engine.resolver'];
-            $finder     = $app['view.finder'];
-            $env        = new Factory($resolver, $finder, $app['events'], $app['shortcode']);
+    public function registerShortcode(){
+        $this->app->singleton('shortcode', function ($app) {
+            return new Shortcode($app['shortcode.compiler']);
+        });
+    }
+    /**
+     * Registro Laravel view.
+     */
+    public function registerView(){
+        $finder = $this->app['view']->getFinder();
+        $this->app->singleton('view', function ($app) use ($finder) {
+            // desde php &|| blade.
+            $resolver = $app['view.engine.resolver'];
+            $env = new Factory($resolver, $finder, $app['events'], $app['shortcode.compiler']);
             $env->setContainer($app);
             $env->share('app', $app);
             return $env;
         });
     }
     /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
+     * Obtiene los services provided de el provider.
+     **/
     public function provides(){
-        return [
-            'shortcode',
-            'view'
-        ];
+        return ['shortcode','shortcode.compiler','view'];
     }
 }
